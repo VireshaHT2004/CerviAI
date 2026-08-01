@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1" />
+  <title>{{ title or "Cervix AI" }}</title>
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* subtle card glass effect */
+    .glass {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: saturate(140%) blur(6px);
+      -webkit-backdrop-filter: saturate(140%) blur(6px);
+    }
+    /* Removed @apply rules. Use Tailwind utility classes directly in HTML elements. */
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-50 to-rose-50">
+  <!-- Top Nav -->
+  <nav class="sticky top-0 z-40 border-b border-white/60 bg-white/70 backdrop-blur">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <a href="{{ url_for('index') }}" class="flex items-center gap-2">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold">AI</span>
+        <span class="font-semibold text-gray-800">Cervix Detection</span>
+      </a>
+
+      <div class="flex items-center gap-2">
+        {% if current_user.is_authenticated %}
+          <span class="chip">
+            {{ current_user.name }} · {{ current_user.role|capitalize }}
+          </span>
+          {% if current_user.role == 'technician' %}
+            <a class="btn btn-neutral" href="{{ url_for('tech_dashboard') }}">Technician</a>
+          {% else %}
+            <a class="btn btn-neutral" href="{{ url_for('doctor_dashboard') }}">Doctor</a>
+          {% endif %}
+          <a class="btn btn-primary" href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+          <a class="btn btn-neutral" href="{{ url_for('login') }}">Login</a>
+          <a class="btn btn-primary" href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash messages -->
+  <div class="mx-auto max-w-3xl px-4 mt-4 space-y-2">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="rounded-xl border px-4 py-3
+                      {% if category=='success' %}border-emerald-200 bg-emerald-50 text-emerald-800
+                      {% elif category=='danger' %}border-rose-200 bg-rose-50 text-rose-800
+                      {% else %}border-slate-200 bg-white text-slate-800{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Page -->
+  <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="py-8 text-center text-sm text-gray-500">
+    © {{ 2025 }} Cervix AI · Built with Flask & YOLOv8
+  </footer>
+</body>
+</html>

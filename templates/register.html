@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mx-auto max-w-3xl">
+  <div class="glass rounded-2xl shadow-xl p-8">
+    <h1 class="text-3xl font-semibold mb-2">Create your account</h1>
+    <p class="text-gray-600 mb-6">Join the platform to upload slides and review predictions.</p>
+
+    <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="md:col-span-2">
+        <label class="label">Full Name</label>
+        <input name="name" type="text" required class="input" placeholder="Dr. A. Kumar / Jane Doe"/>
+      </div>
+      <div>
+        <label class="label">Email</label>
+        <input name="email" type="email" required class="input" placeholder="you@lab.org"/>
+      </div>
+      <div>
+        <label class="label">Password</label>
+        <input name="password" type="password" required class="input" placeholder="••••••••" />
+      </div>
+      <div class="md:col-span-2">
+        <label class="label">Role</label>
+        <select name="role" class="input">
+          <option value="technician">Technician</option>
+          <option value="doctor">Doctor</option>
+        </select>
+      </div>
+      <div class="md:col-span-2">
+        <button class="btn btn-success w-full justify-center">Register</button>
+      </div>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Already have an account?
+      <a href="{{ url_for('login') }}" class="text-indigo-600 hover:underline">Sign in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

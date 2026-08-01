@@ -1,0 +1,17 @@
+# Ignore local and heavy artifacts in Vercel
+.venv/
+venv/
+__pycache__/
+
+# Secrets
+.env
+.flaskenv
+
+# Local DB and instance
+instance/
+backend/data.db
+
+# Large data and models (not needed in serverless)
+data/
+models/
+static/img/

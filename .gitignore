@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+
+# macOS
+.DS_Store
+
+# Virtual envs
+.venv/
+.venv.bak/
+venv/
+
+# Env files / secrets
+.env
+.flaskenv
+
+# Flask instance folder
+instance/
+
+# Local databases / artifacts
+backend/data.db
+
+# Data folders (keep placeholders)
+data/**
+!data/.gitkeep
+!data/inbox/.gitkeep
+!data/out/.gitkeep
+
+# Models (keep placeholder)
+models/**
+!models/.gitkeep
+
+# Static large images (keep placeholder)
+static/img/**
+!static/img/.gitkeep
+
+# Logs
+*.log
+
+# Node/Frontend (if added later)
+node_modules/
+.dist/
+build/

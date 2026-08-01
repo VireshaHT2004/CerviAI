@@ -1,0 +1,22 @@
+Flask==3.0.3
+Flask-Login==0.6.3
+Flask-SQLAlchemy==3.1.1
+Flask-CORS==4.0.1
+Werkzeug==3.0.3
+
+ultralytics==8.3.0
+torch>=2.1.0
+torchvision>=0.16.0
+
+opencv-python==4.10.0.84
+Pillow==10.4.0
+reportlab==4.2.2
+
+# Postgres driver for SQLAlchemy
+psycopg2-binary==2.9.9
+
+# Load env vars from .flaskenv/.env
+python-dotenv==1.0.1
+
+# Vercel WSGI adapter
+vercel-wsgi==0.2.3

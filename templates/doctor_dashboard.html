@@ -1,0 +1,30 @@
+<!-- templates/doctor_dashboard.html -->
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Doctor Dashboard</h1>
+<h2 class="text-xl font-semibold mb-2">Pending Cases</h2>
+<div class="bg-white p-4 shadow rounded overflow-auto">
+  <table class="min-w-full">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-4 py-2 text-left">Image ID</th>
+        <th class="px-4 py-2 text-left">Filename</th>
+        <th class="px-4 py-2 text-left">Uploaded By (User ID)</th>
+        <th class="px-4 py-2 text-left">Review</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for img in images %}
+      <tr class="border-t">
+        <td class="px-4 py-2">{{ img.id }}</td>
+        <td class="px-4 py-2">{{ img.filename }}</td>
+        <td class="px-4 py-2">{{ img.uploaded_by }}</td>
+        <td class="px-4 py-2">
+          <a class="text-blue-600" href="{{ url_for('review', image_id=img.id) }}">Open</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

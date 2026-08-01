@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-6">Review Case #{{ image.id }}</h1>
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+  <div class="glass p-4 rounded-2xl shadow">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-semibold text-gray-800">Original Image</h3>
+      <span class="chip">Filename: {{ image.filename }}</span>
+    </div>
+    <div class="overflow-hidden rounded-xl border">
+      <img id="imgOriginal" class="w-full max-h-[70vh] object-contain bg-black/5"
+           src="{{ url_for('raw_image', image_id=image.id) }}" alt="original">
+    </div>
+  </div>
+
+  <div class="glass p-4 rounded-2xl shadow">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-semibold text-gray-800">Predicted (Annotated)</h3>
+      {% if prediction %}
+        <div class="flex gap-2">
+          <span class="chip">AI: {{ prediction.result }}</span>
+          <span class="chip">Conf: {{ '%.2f'|format(prediction.confidence) }}</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="overflow-hidden rounded-xl border">
+      {% if prediction %}
+        <img id="imgPred" class="w-full max-h-[70vh] object-contain bg-black/5"
+             src="{{ url_for('predicted_image', image_id=image.id) }}" alt="predicted">
+      {% else %}
+        <div class="p-8 text-gray-600">No prediction available.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="glass p-6 rounded-2xl shadow">
+  <form method="POST" action="{{ url_for('submit_report') }}" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <input type="hidden" name="image_id" value="{{ image.id }}" />
+    <div>
+      <label class="label">Final Status</label>
+      <select name="status" class="input">
+        <option value="Positive">Positive</option>
+        <option value="Negative">Negative</option>
+      </select>
+    </div>
+    <div class="md:col-span-2">
+      <label class="label">Remarks (optional)</label>
+      <textarea name="remarks" class="input h-28" placeholder="Notes, artifacts, quality, etc."></textarea>
+    </div>
+    <div class="md:col-span-3">
+      <button class="btn btn-success w-full md:w-auto">Submit Report</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

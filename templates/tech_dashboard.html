@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-6">Technician Dashboard</h1>
+
+{% if yolov7_loaded_err %}
+<div class="rounded-xl border border-amber-200 bg-amber-50 text-amber-900 p-4 mb-6">
+  ⚠ Model failed to load. Error: {{ yolov7_loaded_err }}
+</div>
+{% endif %}
+
+<!-- Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+  <div class="glass p-5 rounded-2xl shadow flex items-center gap-4">
+    <div class="h-12 w-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xl font-bold">U</div>
+    <div>
+      <div class="text-gray-500 text-sm">Total Uploads</div>
+      <div id="stat-total" class="text-3xl font-bold">0</div>
+    </div>
+  </div>
+  <div class="glass p-5 rounded-2xl shadow flex items-center gap-4">
+    <div class="h-12 w-12 rounded-xl bg-rose-600 text-white flex items-center justify-center text-xl font-bold">P</div>
+    <div>
+      <div class="text-gray-500 text-sm">Pending Doctor Review</div>
+      <div id="stat-pending" class="text-3xl font-bold">0</div>
+    </div>
+  </div>
+  <div class="glass p-5 rounded-2xl shadow flex items-center gap-4">
+    <div class="h-12 w-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xl font-bold">C</div>
+    <div>
+      <div class="text-gray-500 text-sm">Completed Reports</div>
+      <div id="stat-completed" class="text-3xl font-bold">0</div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload -->
+<div class="glass p-6 rounded-2xl shadow mb-8">
+  <h2 class="text-xl font-semibold mb-2">Upload microscope image</h2>
+  <p class="text-gray-600 mb-4">Drop a PNG/JPG/TIFF (max 16MB). The AI will annotate and save to your cases.</p>
+
+  <div id="uploadArea"
+       class="border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition hover:bg-white">
+    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto mb-3 h-10 w-10 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M3 15a4 4 0 004 4h10a4 4 0 100-8h-1.26A8 8 0 103 15z" />
+    </svg>
+    <p class="font-medium">Drag & drop an image here or click to select</p>
+    <p class="text-sm text-gray-500">Accepted: PNG, JPG, TIFF</p>
+    <input id="fileInput" type="file" accept="image/*" class="hidden" />
+  </div>
+
+  <div id="uploadProgress" class="hidden mt-4">
+    <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+      <div id="bar" class="h-2 w-1/3 bg-indigo-600 animate-pulse"></div>
+    </div>
+    <p class="mt-2 text-sm text-gray-600">Uploading & predicting…</p>
+  </div>
+
+  <div id="uploadResult" class="hidden mt-4 p-4 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200"></div>
+</div>
+
+<!-- Tabs -->
+<div class="mb-4 flex gap-3">
+  <button onclick="showSection('images')" class="btn btn-neutral">Images</button>
+  <button onclick="showSection('reports')" class="btn btn-neutral">Reports</button>
+</div>
+
+<!-- Images -->
+<div id="section-images" class="section-content">
+  <div class="glass p-4 rounded-2xl shadow overflow-auto">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50 text-gray-600">
+        <tr>
+          <th class="px-4 py-3 text-left">ID</th>
+          <th class="px-4 py-3 text-left">Filename</th>
+          <th class="px-4 py-3 text-left">Uploaded</th>
+          <th class="px-4 py-3 text-left">Status</th>
+          <th class="px-4 py-3 text-left">Cells</th>
+          <th class="px-4 py-3 text-left">Abnormal</th>
+          <th class="px-4 py-3 text-left">Report</th>
+        </tr>
+      </thead>
+      <tbody id="imagesTableBody" class="divide-y divide-gray-100"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Reports -->
+<div id="section-reports" class="section-content hidden">
+  <div class="glass p-4 rounded-2xl shadow overflow-auto">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50 text-gray-600">
+        <tr>
+          <th class="px-4 py-3 text-left">Report ID</th>
+          <th class="px-4 py-3 text-left">Filename</th>
+          <th class="px-4 py-3 text-left">Status</th>
+          <th class="px-4 py-3 text-left">Doctor</th>
+          <th class="px-4 py-3 text-left">Created</th>
+          <th class="px-4 py-3 text-left">Download</th>
+        </tr>
+      </thead>
+      <tbody id="reportsTableBody" class="divide-y divide-gray-100"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/tech_dashboard.js') }}"></script>
+<script>
+  function showSection(which) {
+    document.getElementById('section-images').classList.toggle('hidden', which !== 'images');
+    document.getElementById('section-reports').classList.toggle('hidden', which !== 'reports');
+  }
+
+  // enhance UX for upload area
+  const area = document.getElementById('uploadArea');
+  const input = document.getElementById('fileInput');
+  const progress = document.getElementById('uploadProgress');
+  const result = document.getElementById('uploadResult');
+
+  area.addEventListener('click', () => input.click());
+  area.addEventListener('dragover', e => {
+    e.preventDefault();
+    area.classList.add('ring-2', 'ring-indigo-400');
+  });
+  area.addEventListener('dragleave', () => area.classList.remove('ring-2','ring-indigo-400'));
+  area.addEventListener('drop', e => {
+    e.preventDefault();
+    area.classList.remove('ring-2','ring-indigo-400');
+    if (e.dataTransfer.files?.length) {
+      upload(e.dataTransfer.files[0]);
+    }
+  });
+  input.addEventListener('change', e => {
+    if (e.target.files?.length) upload(e.target.files[0]);
+  });
+
+  async function upload(file) {
+    progress.classList.remove('hidden');
+    result.classList.add('hidden');
+    const form = new FormData();
+    form.append('image', file);
+    try {
+      const r = await fetch('{{ url_for("tech_api_upload") }}', {
+        method: 'POST',
+        body: form
+      });
+      const data = await r.json();
+      progress.classList.add('hidden');
+      if (!data.success) throw new Error(data.error || 'Upload failed');
+      result.textContent = `Uploaded! Predicted cells: ${data.prediction.total_cells} · Abnormal: ${data.prediction.abnormal_cells} · Confidence: ${data.prediction.overall_confidence.toFixed(2)}`;
+      result.classList.remove('hidden');
+      // refresh tables & stats
+      if (window.refreshTechDashboard) window.refreshTechDashboard();
+    } catch (err) {
+      progress.classList.add('hidden');
+      result.textContent = 'Error: ' + err.message;
+      result.classList.remove('hidden');
+      result.classList.remove('bg-emerald-50','text-emerald-800','border-emerald-200');
+      result.classList.add('bg-rose-50','text-rose-800','border','border-rose-200');
+    }
+  }
+</script>
+{% endblock %}
